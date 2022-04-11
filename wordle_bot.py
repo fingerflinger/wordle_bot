@@ -54,12 +54,45 @@ def check_if_possible(word, pattern):
     pass
    
 
+def find_first_guess(wordlist):
+    # For each word in the word list, check the possible outcomes vs remaining 
+    # search space
+    pattern_count = 3*3*3*3*3  # 3 possibilites for each letter
+    for i in range(pattern_count):
+        check_pattern = pattern_from_int(i)
+        pass 
+
+def pattern_from_int(pattern_i):
+    pattern = [0]*5 
+    digit_magnitudes = [3*3*3*3, 3*3*3, 3*3, 3, 1]
+    import pdb;pdb.set_trace()
+    for i in range(5):
+        pattern[i] = int(pattern_i / digit_magnitudes[i])
+        pattern_i = pattern_i - pattern[i]*digit_magnitudes[i]
+    return pattern 
+
+
+def find_valid_subset(search_pattern, check_word, word_list):
+    # Find word-list subset that matches the search pattern
+    # if condition 1 && condition 2 && ..., then add to whitelist
+    for word in word_list:
+        active_digits = [1, 1, 1, 1, 1] # We can only consider active digits, since position matters
+        for i in range(5):
+            if search_pattern[i] == 0:
+                if word[i] != check_word[i]:
+                    break
+                active_digits[i] = 0 # Turn off the digit we just inspected
+            elif search_pattern[i] == 1:
+                # Loop remaining digits and check if in the word but wrong order 
+             
+                
+
 def main():
     #import the word list
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
-    # Remove all words not 5 letters in length
+    
     #populate a graph with 
-    print_pattern("hello", [0,1,0,1,2])
+
 if __name__ == "__main__":
     main()
