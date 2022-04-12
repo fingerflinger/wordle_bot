@@ -26,11 +26,6 @@ def print_pattern(word, pattern):
     print(print_str)
 
 
-def check_if_possible(word, pattern):
-    # pattern 
-    pass
-   
-
 def pattern_from_int(pattern_i):
     pattern = [0]*5 
     digit_magnitudes = [3*3*3*3, 3*3*3, 3*3, 3, 1]
@@ -38,6 +33,7 @@ def pattern_from_int(pattern_i):
         pattern[i] = int(pattern_i / digit_magnitudes[i])
         pattern_i = pattern_i - pattern[i]*digit_magnitudes[i]
     return pattern 
+
 
 def pattern_from_guess(check_word, answer):
     pattern = [0]*5
@@ -64,15 +60,9 @@ def int_from_pattern(pattern):
         pattern_int = pattern_int + pattern[i]*pow(3,4-i)
     return pattern_int
 
-def find_valid_subset(search_pattern, check_word, word_list):
-    # Find patterns for this word against the word_list, and add to search_pattern index to collect metrics for each guess
-    # Find word-list subset that matches the search pattern
-    # if condition 1 && condition 2 && ..., then add to whitelist
-   
-    pass
 
-
-def prune_list(check_word, pattern, word_list):
+def valid_subset(check_word, pattern, word_list):
+    # TODO, there is a bug here that misses some edge cases
     # Return word list subset that conforms to the pattern
     # NOTE: I think there is a way of doing this as a mask operation, but out of expediency, going to loop through
     subset = []
@@ -97,8 +87,8 @@ def prune_list(check_word, pattern, word_list):
                 if pattern[i] == 1:
                     if loc == -1 or active_digits[loc] == False or check_word[i] == x[i]:
                         # Letter cannot be in correct location for this condition
-                        break
                         good_so_far = False
+                        break
                     else:
                         active_digits[loc] = False
                 elif loc != -1 and active_digits[loc]: # pattern[i] = 2
@@ -109,10 +99,10 @@ def prune_list(check_word, pattern, word_list):
                 subset.append(x)
     return subset
 
+
 def calculate_word(word, word_list):
     word = word.lower()
     likelihood = [0] * pow(3,5)
-    word_space = [0] * pow(3,5)
     
     # For input word, calculate all possibilities in the word_list
     for i in range(len(word_list)):
@@ -120,20 +110,35 @@ def calculate_word(word, word_list):
         pattern = pattern_from_guess(word, word_i)
         idx = int_from_pattern(pattern)
         likelihood[idx] = likelihood[idx] + 1
+    return likelihood 
+
+
+def calc_guess_value(likelihood):
+    # Expected value of this guess
+    total_possibilities = sum(likelihood)
+    guess_value = 0
+    for x in likelihood:
+        guess_value = guess_value + x*x / total_possibilities
+    return guess_value
     
-    for i in range(len(word_space)):
-        # For each pattern, mask the word list to determine remaining space
-        import pdb;pdb.set_trace()
-        space = prune_list(word, pattern_from_int(i), word_list)
-        word_space[i] = len(space)
-        
-                
 def main():
+    # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
+
     #import the word list
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
-    test_word = "found"
-    calculate_word(test_word, word_list)
+    word_hits = []
+    best_word = ""
+    best_word_value = -1
+    first_guess = "lares"
+    for test_word in word_list:
+        likelihood = calculate_word(test_word, word_list)
+        value = calc_guess_value(likelihood)
+        if best_word_value < 0 or value < best_word_value:
+            best_word = test_word
+            best_word_value = value
+            print(best_word)
+            print(best_word_value)
 
 if __name__ == "__main__":
     main()
