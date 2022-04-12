@@ -135,14 +135,19 @@ def calc_first_guess(wordlist):
             print(best_word_value)
     return best_word
 
-def calc_guess_n(wordlist, eliminations):
+def calc_guess_n(word_list, eliminations):
     # strike guesses with eiliminated letters. I don't think this is provably optimal, but damn close
     fresh_list = []
     for word in word_list:
+        eliminate = False
         for x in eliminations:
             if x in word:
+                eliminate = True
                 break
-        fresh_list.append(word)
+        if eliminate is False:
+            fresh_list.append(word)
+    import pdb;pdb.set_trace()
+
     best_word = ""
     best_word_value = -1
     for test_word in fresh_list:
@@ -157,7 +162,6 @@ def calc_guess_n(wordlist, eliminations):
 
 
 def get_eliminations(pattern, word):
-    import pdb;pdb.set_trace()
     eliminations = []
     for i in range(5):
         if pattern[i] == 2:
@@ -173,14 +177,20 @@ def main():
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
     my_answer = "royal"
-    first_guess = "lares"
+    my_guess = "lares"
     eliminations = []
-    pattern = pattern_from_guess(first_guess, my_answer)
-    get_eliminations(pattern, first_guess)
+    
+    for i in range(5): # 5 guesses after the first
+        # Make guess
+        pattern = pattern_from_guess(my_guess, my_answer)
+        if int_from_pattern(pattern) == 0:
+            print("SUCCESS")
+            break
+        subset = valid_subset(my_guess, pattern, word_list)
+        eliminations = eliminations + get_eliminations(pattern, my_guess)
+        my_guess = calc_guess_n(subset, eliminations)
 
-    subset = valid_subset(first_guess, pattern, word_list)
-    #calc_guess_n(subset, 
-    import pdb;pdb.set_trace()
-
+         
+    
 if __name__ == "__main__":
     main()
