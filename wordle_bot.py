@@ -120,17 +120,11 @@ def calc_guess_value(likelihood):
     for x in likelihood:
         guess_value = guess_value + x*x / total_possibilities
     return guess_value
-    
-def main():
-    # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
 
-    #import the word list
-    with open("5letter_dict.txt", 'r') as fh:
-        word_list = [line.rstrip() for line in fh]
-    word_hits = []
+
+def calc_first_guess(wordlist):
     best_word = ""
     best_word_value = -1
-    first_guess = "lares"
     for test_word in word_list:
         likelihood = calculate_word(test_word, word_list)
         value = calc_guess_value(likelihood)
@@ -139,6 +133,54 @@ def main():
             best_word_value = value
             print(best_word)
             print(best_word_value)
+    return best_word
+
+def calc_guess_n(wordlist, eliminations):
+    # strike guesses with eiliminated letters. I don't think this is provably optimal, but damn close
+    fresh_list = []
+    for word in word_list:
+        for x in eliminations:
+            if x in word:
+                break
+        fresh_list.append(word)
+    best_word = ""
+    best_word_value = -1
+    for test_word in fresh_list:
+        likelihood = calculate_word(test_word, word_list)
+        value = calc_guess_value(likelihood)
+        if best_word_value < 0 or value < best_word_value:
+            best_word = test_word
+            best_word_value = value
+            print(best_word)
+            print(best_word_value)
+    return best_word
+
+
+def get_eliminations(pattern, word):
+    import pdb;pdb.set_trace()
+    eliminations = []
+    for i in range(5):
+        if pattern[i] == 2:
+           eliminations.append(word[i])
+    
+    return eliminations
+
+
+def main():
+    # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
+
+    #import the word list
+    with open("5letter_dict.txt", 'r') as fh:
+        word_list = [line.rstrip() for line in fh]
+    my_answer = "royal"
+    first_guess = "lares"
+    eliminations = []
+    pattern = pattern_from_guess(first_guess, my_answer)
+    get_eliminations(pattern, first_guess)
+
+    subset = valid_subset(first_guess, pattern, word_list)
+    #calc_guess_n(subset, 
+    import pdb;pdb.set_trace()
 
 if __name__ == "__main__":
     main()
