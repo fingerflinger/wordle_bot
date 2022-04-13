@@ -77,7 +77,6 @@ def find_idx_in_active_digits(word, active_digits, letter):
     if loc == -1:
         return loc
     while(active_digits[loc] == False):
-        import pdb;pdb.set_trace()
         loc = word[(loc+1):].find(letter) # Need to search only active digits
         if loc == -1:
             return loc
@@ -185,7 +184,7 @@ def do_solve():
     # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
-    my_answer = "trots"
+    my_answer = "tiger"
     my_guess = "lares"
     subset = word_list 
 
@@ -196,14 +195,13 @@ def do_solve():
         if int_from_pattern(pattern) == 0:
             print("SUCCESS")
             break
-        if i == 1:
-            import pdb;pdb.set_trace()
         subset = valid_subset(my_guess, pattern, subset)
         my_guess = calc_guess_n(subset)
 
 
 def main():
-    test_valid_subset()
+    #test_valid_subset()
+    do_solve()
          
     
 if __name__ == "__main__":
