@@ -36,20 +36,27 @@ def pattern_from_int(pattern_i):
 
 
 def pattern_from_guess(check_word, answer):
-    pattern = [0]*5
+    pattern = [-1]*5
     check_word = check_word.lower()
     answer = answer.lower()
-    active_digits = [1, 1, 1, 1, 1] # We can only consider active digits, since position matters
+    active_digits = [True] * 5 # We can only consider active digits, since position matters
+    # Need to check in place matches first
     for i in range(5):
         if check_word[i] == answer[i]:
             pattern[i] = 0
-            active_digits[i] = 0
-        elif check_word[i] in answer:
-            loc = answer.index(check_word[i])
-            pattern[i] = 1
-            active_digits[loc] = 0
-        else:
-            pattern[i] = 2
+            active_digits[i] = False
+    for i in range(5):
+        if pattern[i] < 0:
+            if check_word[i] in answer:
+                # Is this letter in the remaining letters? TODO LATEST
+                
+                loc = answer.index(check_word[i])
+                pattern[i] = 1
+                    active_digits[loc] = False
+                else:
+                    pattern[i] = 2
+            else:
+                pattern[i] = 2
     return pattern 
 
 
@@ -135,22 +142,10 @@ def calc_first_guess(wordlist):
             print(best_word_value)
     return best_word
 
-def calc_guess_n(word_list, eliminations):
-    # strike guesses with eiliminated letters. I don't think this is provably optimal, but damn close
-    fresh_list = []
-    for word in word_list:
-        eliminate = False
-        for x in eliminations:
-            if x in word:
-                eliminate = True
-                break
-        if eliminate is False:
-            fresh_list.append(word)
-    import pdb;pdb.set_trace()
-
+def calc_guess_n(word_list):
     best_word = ""
     best_word_value = -1
-    for test_word in fresh_list:
+    for test_word in word_list:
         likelihood = calculate_word(test_word, word_list)
         value = calc_guess_value(likelihood)
         if best_word_value < 0 or value < best_word_value:
@@ -161,15 +156,6 @@ def calc_guess_n(word_list, eliminations):
     return best_word
 
 
-def get_eliminations(pattern, word):
-    eliminations = []
-    for i in range(5):
-        if pattern[i] == 2:
-           eliminations.append(word[i])
-    
-    return eliminations
-
-
 def main():
     # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
 
@@ -178,17 +164,17 @@ def main():
         word_list = [line.rstrip() for line in fh]
     my_answer = "royal"
     my_guess = "lares"
-    eliminations = []
-    
+    subset = word_list 
     for i in range(5): # 5 guesses after the first
         # Make guess
+        if(len(subset) < 5):
+            import pdb;pdb.set_trace()
         pattern = pattern_from_guess(my_guess, my_answer)
         if int_from_pattern(pattern) == 0:
             print("SUCCESS")
             break
-        subset = valid_subset(my_guess, pattern, word_list)
-        eliminations = eliminations + get_eliminations(pattern, my_guess)
-        my_guess = calc_guess_n(subset, eliminations)
+        subset = valid_subset(my_guess, pattern, subset)
+        my_guess = calc_guess_n(subset)
 
          
     
