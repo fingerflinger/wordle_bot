@@ -72,6 +72,17 @@ def int_from_pattern(pattern):
     return pattern_int
 
 
+def find_idx_in_active_digits(word, active_digits, letter):
+    loc = word.find(letter) # Need to search only active digits
+    if loc == -1:
+        return loc
+    while(active_digits[loc] == False):
+        import pdb;pdb.set_trace()
+        loc = word[(loc+1):].find(letter) # Need to search only active digits
+        if loc == -1:
+            return loc
+    return loc
+
 def valid_subset(check_word, pattern, word_list):
     # TODO, there is a bug here that misses some edge cases
     # Return word list subset that conforms to the pattern
@@ -94,7 +105,11 @@ def valid_subset(check_word, pattern, word_list):
         # Surely there is a more elegant implentation, but who cares
         if good_so_far:
             for i in range(5):
-                loc = x.find(check_word[i])
+                if pattern[i] == 0:
+                    # we already did these
+                    continue
+                loc = find_idx_in_active_digits(x, active_digits, check_word[i])
+
                 if pattern[i] == 1:
                     if loc == -1 or active_digits[loc] == False or check_word[i] == x[i]:
                         # Letter cannot be in correct location for this condition
@@ -110,6 +125,12 @@ def valid_subset(check_word, pattern, word_list):
                 subset.append(x)
     return subset
 
+def test_valid_subset():
+    check_word = "crots"
+    pattern = [2, 0, 0, 0, 0]
+    word_list = ["trots", "grots", "crots", "motss"]
+    subset = valid_subset(check_word, pattern, word_list)
+    print(subset)
 
 def calculate_word(word, word_list):
     word = word.lower()
@@ -160,10 +181,8 @@ def calc_guess_n(word_list):
     return best_word
 
 
-def main():
+def do_solve():
     # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
-
-    #import the word list
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
     my_answer = "trots"
@@ -173,15 +192,18 @@ def main():
     for i in range(5): # 5 guesses after the first
         # Make guess
         print("Guess #{}".format(i+1))
-        if(i == 1):
-            import pdb;pdb.set_trace()
         pattern = pattern_from_guess(my_guess, my_answer)
         if int_from_pattern(pattern) == 0:
             print("SUCCESS")
             break
+        if i == 1:
+            import pdb;pdb.set_trace()
         subset = valid_subset(my_guess, pattern, subset)
         my_guess = calc_guess_n(subset)
 
+
+def main():
+    test_valid_subset()
          
     
 if __name__ == "__main__":
