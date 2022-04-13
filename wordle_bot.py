@@ -46,15 +46,19 @@ def pattern_from_guess(check_word, answer):
             pattern[i] = 0
             active_digits[i] = False
     for i in range(5):
+        # extract remaining letters
+        remaining = []
+        remaining_idx = []
+        for j in range(5):
+            if active_digits[j]:
+                remaining.append(answer[j])
+                remaining_idx.append(j)
         if pattern[i] < 0:
-            if check_word[i] in answer:
-                # Is this letter in the remaining letters? TODO LATEST
-                
-                loc = answer.index(check_word[i])
+            # Is this letter in the remaining letters?
+            if check_word[i] in remaining:
+                loc = remaining.index(check_word[i])
                 pattern[i] = 1
-                    active_digits[loc] = False
-                else:
-                    pattern[i] = 2
+                active_digits[loc] = False
             else:
                 pattern[i] = 2
     return pattern 
@@ -162,12 +166,14 @@ def main():
     #import the word list
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
-    my_answer = "royal"
+    my_answer = "trots"
     my_guess = "lares"
     subset = word_list 
+
     for i in range(5): # 5 guesses after the first
         # Make guess
-        if(len(subset) < 5):
+        print("Guess #{}".format(i+1))
+        if(i == 1):
             import pdb;pdb.set_trace()
         pattern = pattern_from_guess(my_guess, my_answer)
         if int_from_pattern(pattern) == 0:
