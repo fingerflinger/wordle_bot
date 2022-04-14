@@ -208,6 +208,7 @@ def do_solve(answer):
         print("Guess #{} is {}".format(i+1, my_guess))
         pattern = pattern_from_guess(my_guess, answer)
         print_pattern(my_guess, pattern)
+        print(pattern)
         if int_from_pattern(pattern) == 0:
             print("SUCCESS")
             return my_guess
@@ -224,30 +225,20 @@ def interactive():
     print("Please guess LARES for your first guess and enter the resulting pattern")
     print("0 for green, 1 for yellow, 2 for grey")
     with open("5letter_dict.txt", 'r') as fh:
-        subset = [line.rstrip() for line in fh]
+        subset = [line.rstrip().lower() for line in fh]
     while(done == False):
         # Get pattern from the previous guess
-        pattern = input("Please enter the pattern:\n")
-        if pattern == "quit":
-            done = True
-        pattern = list(pattern)
+        pattern_input = input("Please enter the pattern:\n")
+        if pattern_input == "quit":
+            break
+        pattern = [int(x) for x in pattern_input]
         # print out next guess
         subset = valid_subset(my_guess, pattern, subset)
         my_guess = calc_guess_n(subset)
         print("Here is my new guess, enter it {}".format(my_guess))
    
-def test_find_idx_in_active_digits():
-    find_idx_in_active_digits('spear', [False, True, True, True, True], 'e')
-
-def test_pattern_from_guess():
-    print(pattern_from_guess_2('lares', 'black'))
-    print(pattern_from_guess_2('lares', 'royal'))
-
 
 def main():
-    #test_valid_subset()
-    #test_pattern_from_guess()
-    #test_find_idx_in_active_digits()
     interactive()
          
     
