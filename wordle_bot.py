@@ -175,8 +175,6 @@ def calc_guess_n(word_list):
         if best_word_value < 0 or value < best_word_value:
             best_word = test_word
             best_word_value = value
-            print(best_word)
-            print(best_word_value)
     return best_word
 
 
@@ -184,7 +182,7 @@ def do_solve():
     # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
     with open("5letter_dict.txt", 'r') as fh:
         word_list = [line.rstrip() for line in fh]
-    my_answer = "tiger"
+    my_answer = "chunk"
     my_guess = "lares"
     subset = word_list 
 
@@ -199,9 +197,28 @@ def do_solve():
         my_guess = calc_guess_n(subset)
 
 
+def interactive():
+    done = False
+    my_guess = 'lares'
+    print("Please guess LARES for your first guess and enter the resulting pattern")
+    print("0 for green, 1 for yellow, 2 for grey")
+    with open("5letter_dict.txt", 'r') as fh:
+        subset = [line.rstrip() for line in fh]
+    while(done == False):
+        # Get pattern from the previous guess
+        pattern = input("Please enter the pattern:\n")
+        if pattern == "quit":
+            done = True
+        pattern = list(pattern)
+        # print out next guess
+        subset = valid_subset(my_guess, pattern, subset)
+        my_guess = calc_guess_n(subset)
+        print("Here is my new guess, enter it {}".format(my_guess))
+        
 def main():
     #test_valid_subset()
     do_solve()
+    #interactive()
          
     
 if __name__ == "__main__":
