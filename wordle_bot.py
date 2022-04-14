@@ -86,8 +86,6 @@ def find_idx_in_active_digits(word, active_digits, letter):
             # Eventually we will hit the end of the word and end up here
             return -1
         loc_offset = loc_offset + new_offset + 1 # + 1 here because -1 indicates fail 2 find
-        #if(word == "algor"):
-            #import pdb;pdb.set_trace()
     
     # We kick out of the loop once active_digits[loc+locoffset] is True
     return loc+loc_offset
@@ -189,30 +187,35 @@ def calc_guess_n(word_list):
     return best_word
 
 
-def do_solve():
+def do_solve(answer):
     # Guesses are only valid if on word list, so do not have to calculate exhaustive 5 letter sequences
     with open("5letter_dict.txt", 'r') as fh:
-        word_list = [line.rstrip() for line in fh]
+        word_list = [line.rstrip().lower() for line in fh]
+    answer = answer.lower()
+    if answer not in word_list:
+        print("Sorry, this word isn't in my vocabulary, I won't be able to solve for it")
+        return False
     '''
     Challenges
     Black - runtime? Stuck in a loop?
     Royal - runtime? Stuck in a loop?
     '''
-    my_answer = "royal"
     my_guess = "lares"
     subset = word_list 
 
     for i in range(5): # 5 guesses after the first
         # Make guess
         print("Guess #{} is {}".format(i+1, my_guess))
-        pattern = pattern_from_guess(my_guess, my_answer)
+        pattern = pattern_from_guess(my_guess, answer)
         print_pattern(my_guess, pattern)
         if int_from_pattern(pattern) == 0:
             print("SUCCESS")
-            break
+            return my_guess
         subset = valid_subset(my_guess, pattern, subset)
         print("Remaining possible words: {}".format(len(subset)))
         my_guess = calc_guess_n(subset)
+
+    return False
 
 
 def interactive():
@@ -243,10 +246,9 @@ def test_pattern_from_guess():
 
 def main():
     #test_valid_subset()
-    do_solve()
     #test_pattern_from_guess()
     #test_find_idx_in_active_digits()
-    #interactive()
+    interactive()
          
     
 if __name__ == "__main__":
